@@ -139,6 +139,8 @@
       }
     });
 
+    var isMobile = L.Browser.mobile;
+
     map = L.map('world-map', {
       center: initialCenter,
       zoom: initialZoom,
@@ -147,7 +149,17 @@
       zoomControl: true,
       attributionControl: false,
       scrollWheelZoom: true,
-      worldCopyJump: true
+      worldCopyJump: true,
+      tap: !isMobile,
+      dragging: !isMobile ? true : true,
+      touchZoom: true
+    });
+
+    /* Force recalculate map size after mount */
+    setTimeout(function() { map.invalidateSize(); }, 300);
+    /* Also on window resize */
+    window.addEventListener('resize', function() {
+      if (map) map.invalidateSize();
     });
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
