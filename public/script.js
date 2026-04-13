@@ -143,6 +143,8 @@ function initMobileMenu() {
   let campioni = [];
   let filteredCampioni = [];
   let currentView = 'grid';
+  let visibleCount = 12;
+  const PAGE_SIZE = 12;
 
   const galleryGrid = document.getElementById('gallery-grid');
   const searchInput = document.getElementById('search-input');
