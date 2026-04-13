@@ -218,19 +218,115 @@ function initMobileMenu() {
     updatePaesiDropdown();
   }
 
+  /* Complete list of all recognized countries in Italian */
+  var ALL_COUNTRIES = [
+    'Afghanistan','Albania','Algeria','Andorra','Angola','Antigua e Barbuda','Arabia Saudita',
+    'Argentina','Armenia','Australia','Austria','Azerbaigian','Bahamas','Bahrein','Bangladesh',
+    'Barbados','Belgio','Belize','Benin','Bhutan','Bielorussia','Bolivia',
+    'Bosnia ed Erzegovina','Botswana','Brasile','Brunei','Bulgaria','Burkina Faso','Burundi',
+    'Cambogia','Camerun','Canada','Ciad','Cile','Cina','Cipro','Colombia','Comore',
+    'Corea del Nord','Corea del Sud','Costa Rica','Costa d\'Avorio','Croazia','Cuba',
+    'Danimarca','Dominica','Ecuador','Egitto','El Salvador','Emirati Arabi','Eritrea',
+    'Estonia','Eswatini','Etiopia','Figi','Filippine','Finlandia','Francia','Gabon','Gambia',
+    'Georgia','Germania','Ghana','Giamaica','Giappone','Gibuti','Giordania','Grecia',
+    'Grenada','Guatemala','Guinea','Guinea Equatoriale','Guinea-Bissau','Guyana','Haiti',
+    'Honduras','India','Indonesia','Iran','Iraq','Irlanda','Islanda','Israele','Italia',
+    'Kazakistan','Kenia','Kirghizistan','Kiribati','Kuwait','Laos','Lesotho','Lettonia',
+    'Libano','Liberia','Libia','Liechtenstein','Lituania','Lussemburgo','Macedonia del Nord',
+    'Madagascar','Malawi','Malesia','Maldive','Mali','Malta','Marocco','Mauritania',
+    'Messico','Micronesia','Moldavia','Monaco','Mongolia','Montenegro','Mozambico','Myanmar',
+    'Namibia','Nauru','Nepal','Nicaragua','Niger','Nigeria','Norvegia','Nuova Zelanda',
+    'Oman','Paesi Bassi','Pakistan','Palau','Panama','Papua Nuova Guinea','Paraguay','Perù',
+    'Polonia','Portogallo','Qatar','Regno Unito','Rep. Centrafricana','Rep. Ceca',
+    'Rep. del Congo','Rep. Dem. del Congo','Rep. delle Maldive','Rep. di Capo Verde',
+    'Rep. di Mauritius','Repubblica Dominicana','Romania','Ruanda','Russia',
+    'Saint Kitts e Nevis','Saint Lucia','Saint Vincent e Grenadine','Samoa',
+    'San Marino','São Tomé e Príncipe','Senegal','Serbia','Seychelles','Sierra Leone',
+    'Singapore','Siria','Slovacchia','Slovenia','Somalia','Spagna','Sri Lanka',
+    'Sudafrica','Sudan','Sudan del Sud','Suriname','Svezia','Svizzera',
+    'Tagikistan','Tanzania','Thailandia','Timor Est','Togo','Tonga',
+    'Trinidad e Tobago','Tunisia','Turchia','Turkmenistan','Tuvalu',
+    'Ucraina','Uganda','Ungheria','Uruguay','Uzbekistan','Vanuatu','Vaticano',
+    'Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'
+  ];
+
+  /* Continent mapping for countries not in campioni */
+  var COUNTRY_CONTINENT = {
+    'Afghanistan':'Asia','Albania':'Europa','Algeria':'Africa','Andorra':'Europa','Angola':'Africa',
+    'Antigua e Barbuda':'Nord America','Arabia Saudita':'Asia','Argentina':'Sud America',
+    'Armenia':'Asia','Australia':'Oceania','Austria':'Europa','Azerbaigian':'Asia',
+    'Bahamas':'Nord America','Bahrein':'Asia','Bangladesh':'Asia','Barbados':'Nord America',
+    'Belgio':'Europa','Belize':'Nord America','Benin':'Africa','Bhutan':'Asia',
+    'Bielorussia':'Europa','Bolivia':'Sud America','Bosnia ed Erzegovina':'Europa',
+    'Botswana':'Africa','Brasile':'Sud America','Brunei':'Asia','Bulgaria':'Europa',
+    'Burkina Faso':'Africa','Burundi':'Africa','Cambogia':'Asia','Camerun':'Africa',
+    'Canada':'Nord America','Ciad':'Africa','Cile':'Sud America','Cina':'Asia',
+    'Cipro':'Europa','Colombia':'Sud America','Comore':'Africa','Corea del Nord':'Asia',
+    'Corea del Sud':'Asia','Costa Rica':'Nord America','Costa d\'Avorio':'Africa',
+    'Croazia':'Europa','Cuba':'Nord America','Danimarca':'Europa','Dominica':'Nord America',
+    'Ecuador':'Sud America','Egitto':'Africa','El Salvador':'Nord America',
+    'Emirati Arabi':'Asia','Eritrea':'Africa','Estonia':'Europa','Eswatini':'Africa',
+    'Etiopia':'Africa','Figi':'Oceania','Filippine':'Asia','Finlandia':'Europa',
+    'Francia':'Europa','Gabon':'Africa','Gambia':'Africa','Georgia':'Asia',
+    'Germania':'Europa','Ghana':'Africa','Giamaica':'Nord America','Giappone':'Asia',
+    'Gibuti':'Africa','Giordania':'Asia','Grecia':'Europa','Grenada':'Nord America',
+    'Guatemala':'Nord America','Guinea':'Africa','Guinea Equatoriale':'Africa',
+    'Guinea-Bissau':'Africa','Guyana':'Sud America','Haiti':'Nord America',
+    'Honduras':'Nord America','India':'Asia','Indonesia':'Asia','Iran':'Asia',
+    'Iraq':'Asia','Irlanda':'Europa','Islanda':'Europa','Israele':'Asia','Italia':'Europa',
+    'Kazakistan':'Asia','Kenia':'Africa','Kirghizistan':'Asia','Kiribati':'Oceania',
+    'Kuwait':'Asia','Laos':'Asia','Lesotho':'Africa','Lettonia':'Europa','Libano':'Asia',
+    'Liberia':'Africa','Libia':'Africa','Liechtenstein':'Europa','Lituania':'Europa',
+    'Lussemburgo':'Europa','Macedonia del Nord':'Europa','Madagascar':'Africa',
+    'Malawi':'Africa','Malesia':'Asia','Maldive':'Asia','Mali':'Africa','Malta':'Europa',
+    'Marocco':'Africa','Mauritania':'Africa','Messico':'Nord America','Micronesia':'Oceania',
+    'Moldavia':'Europa','Monaco':'Europa','Mongolia':'Asia','Montenegro':'Europa',
+    'Mozambico':'Africa','Myanmar':'Asia','Namibia':'Africa','Nauru':'Oceania',
+    'Nepal':'Asia','Nicaragua':'Nord America','Niger':'Africa','Nigeria':'Africa',
+    'Norvegia':'Europa','Nuova Zelanda':'Oceania','Oman':'Asia','Paesi Bassi':'Europa',
+    'Pakistan':'Asia','Palau':'Oceania','Panama':'Nord America',
+    'Papua Nuova Guinea':'Oceania','Paraguay':'Sud America','Perù':'Sud America',
+    'Polonia':'Europa','Portogallo':'Europa','Qatar':'Asia','Regno Unito':'Europa',
+    'Rep. Centrafricana':'Africa','Rep. Ceca':'Europa','Rep. del Congo':'Africa',
+    'Rep. Dem. del Congo':'Africa','Rep. delle Maldive':'Asia','Rep. di Capo Verde':'Africa',
+    'Rep. di Mauritius':'Africa','Repubblica Dominicana':'Nord America','Romania':'Europa',
+    'Ruanda':'Africa','Russia':'Europa','Saint Kitts e Nevis':'Nord America',
+    'Saint Lucia':'Nord America','Saint Vincent e Grenadine':'Nord America','Samoa':'Oceania',
+    'San Marino':'Europa','São Tomé e Príncipe':'Africa','Senegal':'Africa','Serbia':'Europa',
+    'Seychelles':'Africa','Sierra Leone':'Africa','Singapore':'Asia','Siria':'Asia',
+    'Slovacchia':'Europa','Slovenia':'Europa','Somalia':'Africa','Spagna':'Europa',
+    'Sri Lanka':'Asia','Sudafrica':'Africa','Sudan':'Africa','Sudan del Sud':'Africa',
+    'Suriname':'Sud America','Svezia':'Europa','Svizzera':'Europa','Tagikistan':'Asia',
+    'Tanzania':'Africa','Thailandia':'Asia','Timor Est':'Asia','Togo':'Africa',
+    'Tonga':'Oceania','Trinidad e Tobago':'Nord America','Tunisia':'Africa','Turchia':'Asia',
+    'Turkmenistan':'Asia','Tuvalu':'Oceania','Ucraina':'Europa','Uganda':'Africa',
+    'Ungheria':'Europa','Uruguay':'Sud America','Uzbekistan':'Asia','Vanuatu':'Oceania',
+    'Vaticano':'Europa','Venezuela':'Sud America','Vietnam':'Asia','Yemen':'Asia',
+    'Zambia':'Africa','Zimbabwe':'Africa'
+  };
+
   function updatePaesiDropdown() {
     var selectedContinente = filterContinente.value;
     var currentPaese = filterPaese.value;
 
-    var paesi = [...new Set(
-      campioni
-        .filter(function(c){return !selectedContinente || c.continente === selectedContinente})
-        .map(function(c){return c.paese})
-        .filter(Boolean)
-    )].sort();
+    /* Merge countries from campioni data + ALL_COUNTRIES, filter by continent if selected */
+    var fromCampioni = campioni.map(function(c) { return c.paese; }).filter(Boolean);
+    var allPaesi = [...new Set(fromCampioni.concat(ALL_COUNTRIES))];
+
+    if (selectedContinente) {
+      allPaesi = allPaesi.filter(function(p) {
+        /* Check campioni first for continent info */
+        var campioneMatch = campioni.find(function(c) { return c.paese === p; });
+        if (campioneMatch) return campioneMatch.continente === selectedContinente;
+        /* Fall back to COUNTRY_CONTINENT mapping */
+        return COUNTRY_CONTINENT[p] === selectedContinente;
+      });
+    }
+
+    allPaesi.sort();
 
     filterPaese.innerHTML = '<option value="">Tutti i paesi</option>';
-    paesi.forEach(function(p) {
+    allPaesi.forEach(function(p) {
       var opt = document.createElement('option');
       opt.value = p;
       opt.textContent = (COUNTRY_FLAGS[p] || '') + ' ' + p;
