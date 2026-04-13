@@ -421,14 +421,17 @@ function initMobileMenu() {
 
     if (shown === 0) {
       galleryGrid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><h3>Nessun campione trovato</h3><p>Prova a modificare i filtri o la ricerca per trovare altri campioni.</p></div>';
+      removeLoadMoreBtn();
       return;
     }
 
-    if (currentView === 'list') {
-      galleryGrid.innerHTML = filteredCampioni.map(function(c, i) {
-        var sandColor = getSandColor(c.tipologia);
-        var textColor = getContrastTextColor(sandColor);
-        var flag = COUNTRY_FLAGS[c.paese] || '';
+    var toShow = filteredCampioni.slice(0, visibleCount);
+
+    function renderCard(c, i) {
+      var sandColor = getSandColor(c.tipologia);
+      var textColor = getContrastTextColor(sandColor);
+      var flag = COUNTRY_FLAGS[c.paese] || '';
+      if (currentView === 'list') {
         return '<a href="dettaglio.html?id=' + c.id + '" class="card card-list" style="animation-delay: ' + Math.min(i * 0.03, 0.3) + 's" aria-label="Scheda dettaglio: ' + c.nome + '">' +
           '<div class="card-list-image">' +
             '<img class="card-image" src="' + basePath + c.immagine + '" alt="' + c.nome + '" loading="lazy" onerror="this.src=\'' + basePath + 'images/coming-soon.jpg\';">' +
@@ -446,12 +449,7 @@ function initMobileMenu() {
           '</div>' +
           '<span class="card-list-id">#' + c.id + '</span>' +
         '</a>';
-      }).join('');
-    } else {
-      galleryGrid.innerHTML = filteredCampioni.map(function(c, i) {
-        var sandColor = getSandColor(c.tipologia);
-        var textColor = getContrastTextColor(sandColor);
-        var flag = COUNTRY_FLAGS[c.paese] || '';
+      } else {
         return '<a href="dettaglio.html?id=' + c.id + '" class="card" style="animation-delay: ' + Math.min(i * 0.05, 0.4) + 's" aria-label="Scheda dettaglio: ' + c.nome + '">' +
           '<div class="card-image-wrapper">' +
             '<img class="card-image" src="' + basePath + c.immagine + '" alt="Campione di sabbia: ' + c.nome + ', ' + c.provenienza + '" loading="lazy" onerror="this.src=\'' + basePath + 'images/coming-soon.jpg\'; this.alt=\'Immagine non disponibile\';">' +
@@ -470,8 +468,10 @@ function initMobileMenu() {
             '</div>' +
           '</div>' +
         '</a>';
-      }).join('');
+      }
     }
+
+    galleryGrid.innerHTML = toShow.map(renderCard).join('');
 
     // Attach hover/focus listeners
     galleryGrid.querySelectorAll('.sand-type-item').forEach(function(el) {
@@ -492,6 +492,39 @@ function initMobileMenu() {
       el.addEventListener('focus', activate);
       el.addEventListener('blur', deactivate);
     });
+
+    // Load more button
+    updateLoadMoreBtn(shown);
+  }
+
+  function removeLoadMoreBtn() {
+    var existing = document.getElementById('load-more-container');
+    if (existing) existing.remove();
+  }
+
+  function updateLoadMoreBtn(totalFiltered) {
+    removeLoadMoreBtn();
+    var gallerySection = document.querySelector('.gallery-section');
+    if (!gallerySection) return;
+
+    var container = document.createElement('div');
+    container.id = 'load-more-container';
+    container.style.textAlign = 'center';
+    container.style.padding = '2rem 1rem';
+
+    if (visibleCount >= totalFiltered) {
+      container.innerHTML = '<p style="color:var(--color-text-muted);font-size:0.92rem;">Hai visto tutti i <strong>' + totalFiltered + '</strong> campioni</p>';
+    } else {
+      var btn = document.createElement('button');
+      btn.className = 'btn btn-load-more';
+      btn.textContent = 'Mostra altri campioni';
+      btn.addEventListener('click', function() {
+        visibleCount += PAGE_SIZE;
+        renderGallery();
+      });
+      container.appendChild(btn);
+    }
+    gallerySection.appendChild(container);
   }
 
   /* --- Event Listeners --- */
