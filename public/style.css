@@ -1688,7 +1688,7 @@ h1, h2, h3, h4 {
 
 #world-map {
   width: 100%;
-  height: 480px;
+  height: 520px;
   background: #f0ece6;
 }
 
@@ -1800,7 +1800,7 @@ h1, h2, h3, h4 {
 
 @media (max-width: 768px) {
   #world-map {
-    height: 320px;
+    height: 400px;
   }
   .map-section {
     padding: 2rem 1rem 1.5rem;
