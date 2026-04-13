@@ -1815,6 +1815,58 @@ h1, h2, h3, h4 {
 }
 
 /* ============================================
+   LOAD MORE BUTTON
+   ============================================ */
+.btn-load-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 2.5rem;
+  background: linear-gradient(135deg, var(--color-ocra), #D4A84A);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+  box-shadow: var(--shadow-md);
+  min-height: 48px;
+}
+
+.btn-load-more:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  filter: brightness(1.05);
+}
+
+.btn-load-more:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   MAP TOUCH FIX
+   ============================================ */
+#world-map {
+  touch-action: manipulation;
+}
+
+/* ============================================
+   TOUCH TARGET ACCESSIBILITY
+   ============================================ */
+.filter-group select,
+.filter-group input,
+.btn,
+.view-toggle-btn,
+.menu-toggle {
+  min-height: 44px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================
    UTILITY
    ============================================ */
 .sr-only {
