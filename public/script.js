@@ -393,6 +393,7 @@ function initMobileMenu() {
       return true;
     });
 
+    visibleCount = PAGE_SIZE;
     renderFilterBadges();
     renderGallery();
   }
@@ -405,6 +406,7 @@ function initMobileMenu() {
     filterTipologia.value = '';
     updatePaesiDropdown();
     filteredCampioni = [...campioni];
+    visibleCount = PAGE_SIZE;
     renderFilterBadges();
     renderGallery();
   }
