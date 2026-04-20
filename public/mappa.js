@@ -199,8 +199,9 @@
             var count = countryData[iso] || 0;
             return {
               fillColor: getCountryColor(count),
-              weight: 1,
-              color: COLOR_BORDER,
+              weight: 0,
+              color: 'transparent',
+              stroke: false,
               fillOpacity: count > 0 ? 0.85 : 0.4
             };
           },
