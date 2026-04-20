@@ -311,21 +311,16 @@ function initMobileMenu() {
     var selectedContinente = filterContinente.value;
     var currentPaese = filterPaese.value;
 
-    /* Merge countries from campioni data + ALL_COUNTRIES, filter by continent if selected */
-    var fromCampioni = campioni.map(function(c) { return c.paese; }).filter(Boolean);
-    var allPaesi = [...new Set(fromCampioni.concat(ALL_COUNTRIES))];
-
+    /* Show ONLY countries that actually have at least one sample, filtered by continent. */
+    var source = campioni;
     if (selectedContinente) {
-      allPaesi = allPaesi.filter(function(p) {
-        /* Check campioni first for continent info */
-        var campioneMatch = campioni.find(function(c) { return c.paese === p; });
-        if (campioneMatch) return campioneMatch.continente === selectedContinente;
-        /* Fall back to COUNTRY_CONTINENT mapping */
-        return COUNTRY_CONTINENT[p] === selectedContinente;
-      });
+      source = source.filter(function(c) { return c.continente === selectedContinente; });
     }
-
-    allPaesi.sort();
+    var allPaesi = [...new Set(
+      source
+        .map(function(c) { return c.paese; })
+        .filter(function(p) { return p && p !== 'Non specificato'; })
+    )].sort(function(a,b){ return a.localeCompare(b, 'it'); });
 
     filterPaese.innerHTML = '<option value="">Tutti i paesi</option>';
     allPaesi.forEach(function(p) {
@@ -335,6 +330,10 @@ function initMobileMenu() {
       if (p === currentPaese) opt.selected = true;
       filterPaese.appendChild(opt);
     });
+    /* If currentPaese is no longer valid for selected continent, reset it */
+    if (currentPaese && filterPaese.value !== currentPaese) {
+      filterPaese.value = '';
+    }
   }
 
   /* --- Render Filter Badges --- */
