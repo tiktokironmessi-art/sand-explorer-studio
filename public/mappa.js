@@ -139,7 +139,7 @@
       }
     });
 
-    var isMobile = L.Browser.mobile;
+    var isTouch = L.Browser.mobile || L.Browser.touch;
 
     map = L.map('world-map', {
       center: initialCenter,
@@ -148,16 +148,22 @@
       maxZoom: 6,
       zoomControl: true,
       attributionControl: false,
-      scrollWheelZoom: !isMobile,
+      scrollWheelZoom: !isTouch,
       worldCopyJump: true,
       tap: false,
-      dragging: true,
-      touchZoom: true,
-      doubleClickZoom: !isMobile,
+      dragging: !isTouch,
+      touchZoom: isTouch ? 'center' : true,
+      doubleClickZoom: !isTouch,
       boxZoom: false,
       keyboard: false,
       bounceAtZoomLimits: false
     });
+
+    if (isTouch) {
+      map.dragging.disable();
+      map.scrollWheelZoom.disable();
+      map.doubleClickZoom.disable();
+    }
 
     /* Force recalculate map size after mount, on resize and on orientation change */
     function safeInvalidate() { if (map) { try { map.invalidateSize(); } catch(e){} } }
@@ -265,7 +271,7 @@
                   mapTooltip.style.top = (e.originalEvent.clientY - rect.top - 10) + 'px';
                 }
               },
-              click: function () {
+              click: function (e) {
                 if (name && count > 0) {
                   var bounds = layer.getBounds();
                   map.flyToBounds(bounds, { padding: [40, 40], duration: 0.8, maxZoom: 5 });
@@ -290,7 +296,9 @@
                       '<div class="map-tooltip-header">' + flag + ' <strong>' + name + '</strong></div>' +
                       '<div class="map-tooltip-count"><em>0 campioni</em></div>';
                     var rect = mapContainer.getBoundingClientRect();
-                    var ev = (window.event && window.event.touches && window.event.touches[0]) || window.event || {};
+                    var ev = (e && e.originalEvent && e.originalEvent.changedTouches && e.originalEvent.changedTouches[0]) ||
+                      (e && e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0]) ||
+                      (e && e.originalEvent) || {};
                     mapTooltip.style.left = ((ev.clientX || rect.width/2) - rect.left + 14) + 'px';
                     mapTooltip.style.top  = ((ev.clientY || rect.height/2) - rect.top - 10) + 'px';
                     mapTooltip.style.display = 'block';

@@ -247,11 +247,13 @@ h1, h2, h3, h4 {
   backdrop-filter: blur(4px);
   z-index: 190;
   opacity: 0;
+  pointer-events: none;
   transition: opacity var(--duration-normal) var(--ease-out);
 }
 
 .mobile-nav-overlay.active {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .mobile-nav {
@@ -264,6 +266,7 @@ h1, h2, h3, h4 {
   background: var(--color-bg-elevated);
   z-index: 195;
   transform: translateX(100%);
+  pointer-events: none;
   transition: transform var(--duration-normal) var(--ease-out);
   box-shadow: -8px 0 30px rgba(42, 37, 32, 0.12);
   padding: 5rem 2rem 2rem;
@@ -271,6 +274,7 @@ h1, h2, h3, h4 {
 
 .mobile-nav.active {
   transform: translateX(0);
+  pointer-events: auto;
 }
 
 .mobile-nav a {
@@ -1370,7 +1374,7 @@ h1, h2, h3, h4 {
 
   /* Map on tablet */
   .map-container {
-    overflow-x: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
 }
@@ -1813,6 +1817,21 @@ h1, h2, h3, h4 {
     gap: 0.5rem;
     font-size: 0.72rem;
   }
+
+  .map-container,
+  #world-map,
+  .map-back-btn,
+  .leaflet-control-container,
+  .leaflet-top,
+  .leaflet-bottom {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 769px) {
+  #world-map {
+    height: 520px;
+  }
 }
 
 /* ============================================
@@ -1863,6 +1882,13 @@ h1, h2, h3, h4 {
 }
 
 /* Keep Leaflet internal panes strictly inside the container */
+.map-container .leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative;
+  z-index: 1;
+}
+
 .map-container .leaflet-container,
 .map-container .leaflet-pane,
 .map-container .leaflet-overlay-pane,
@@ -1871,6 +1897,13 @@ h1, h2, h3, h4 {
 .map-container .leaflet-tooltip-pane,
 .map-container .leaflet-popup-pane {
   max-width: 100%;
+}
+
+.map-container .leaflet-top,
+.map-container .leaflet-bottom,
+.map-container .leaflet-control-container,
+.map-container .leaflet-pane {
+  z-index: 2;
 }
 
 /* Sections AFTER the map must sit above any stray map pane and stay tappable */
@@ -1925,6 +1958,14 @@ h1, h2, h3, h4 {
   .filters-actions { flex-wrap: wrap; gap: 0.75rem; }
   /* Ensure no Leaflet pane catches taps on neighbouring controls */
   .leaflet-container { outline: none; }
+
+  .map-container {
+    touch-action: manipulation;
+  }
+
+  .map-container .leaflet-container {
+    touch-action: pan-x pan-y;
+  }
 }
 
 /* ============================================
