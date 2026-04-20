@@ -199,8 +199,9 @@
             var count = countryData[iso] || 0;
             return {
               fillColor: getCountryColor(count),
-              weight: 1,
-              color: COLOR_BORDER,
+              weight: 0,
+              color: 'transparent',
+              stroke: false,
               fillOpacity: count > 0 ? 0.85 : 0.4
             };
           },
@@ -221,8 +222,8 @@
                 var l = e.target;
                 l.setStyle({
                   fillColor: count > 0 ? COLOR_HOVER : '#D0C8BD',
-                  weight: 2,
-                  color: COLOR_HOVER,
+                  weight: 0,
+                  color: 'transparent',
                   fillOpacity: 0.9
                 });
                 l.bringToFront();
