@@ -1851,8 +1851,43 @@ h1, h2, h3, h4 {
    MAP TOUCH FIX
    ============================================ */
 #world-map {
-  touch-action: manipulation;
+  touch-action: pan-x pan-y;
 }
+
+/* Map container must clip Leaflet panes so they never overlap controls below */
+.map-container {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 1;
+}
+
+/* Keep Leaflet internal panes strictly inside the container */
+.map-container .leaflet-container,
+.map-container .leaflet-pane,
+.map-container .leaflet-overlay-pane,
+.map-container .leaflet-tile-pane,
+.map-container .leaflet-marker-pane,
+.map-container .leaflet-tooltip-pane,
+.map-container .leaflet-popup-pane {
+  max-width: 100%;
+}
+
+/* Sections AFTER the map must sit above any stray map pane and stay tappable */
+.filters-section,
+.results-bar,
+.gallery-section,
+.curiosita-section,
+.site-footer {
+  position: relative;
+  z-index: 5;
+}
+
+/* Header always above the map */
+.site-header { z-index: 1000; }
+
+/* Spacing between map and the filters below to avoid visual collision */
+.map-section { margin-bottom: 1rem; }
 
 /* ============================================
    TOUCH TARGET ACCESSIBILITY
@@ -1865,6 +1900,31 @@ h1, h2, h3, h4 {
   min-height: 44px;
   position: relative;
   z-index: 1;
+}
+
+/* Guarantee tap reliability on mobile/tablet for all interactive controls */
+@media (max-width: 1024px) {
+  .btn,
+  .btn-secondary,
+  .btn-primary,
+  .btn-back,
+  .btn-load-more,
+  .filter-group select,
+  .filter-group input,
+  .view-toggle,
+  .view-toggle-btn,
+  .menu-toggle,
+  .filter-badge-x,
+  .map-back-btn {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(184, 92, 56, 0.15);
+    pointer-events: auto !important;
+    cursor: pointer;
+  }
+  .view-toggle-btn { min-width: 44px; min-height: 44px; }
+  .filters-actions { flex-wrap: wrap; gap: 0.75rem; }
+  /* Ensure no Leaflet pane catches taps on neighbouring controls */
+  .leaflet-container { outline: none; }
 }
 
 /* ============================================
