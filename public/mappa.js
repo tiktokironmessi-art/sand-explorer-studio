@@ -139,8 +139,6 @@
       }
     });
 
-    var isTouch = L.Browser.mobile || L.Browser.touch;
-
     map = L.map('world-map', {
       center: initialCenter,
       zoom: initialZoom,
@@ -148,22 +146,16 @@
       maxZoom: 6,
       zoomControl: true,
       attributionControl: false,
-      scrollWheelZoom: !isTouch,
+      scrollWheelZoom: true,
       worldCopyJump: true,
-      tap: false,
-      dragging: !isTouch,
-      touchZoom: isTouch ? 'center' : true,
-      doubleClickZoom: !isTouch,
+      tap: true,
+      dragging: true,
+      touchZoom: true,
+      doubleClickZoom: true,
       boxZoom: false,
       keyboard: false,
       bounceAtZoomLimits: false
     });
-
-    if (isTouch) {
-      map.dragging.disable();
-      map.scrollWheelZoom.disable();
-      map.doubleClickZoom.disable();
-    }
 
     /* Force recalculate map size after mount, on resize and on orientation change */
     function safeInvalidate() { if (map) { try { map.invalidateSize(); } catch(e){} } }
