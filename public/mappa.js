@@ -148,19 +148,33 @@
       maxZoom: 6,
       zoomControl: true,
       attributionControl: false,
-      scrollWheelZoom: true,
+      scrollWheelZoom: !isMobile,
       worldCopyJump: true,
-      tap: !isMobile,
-      dragging: !isMobile ? true : true,
-      touchZoom: true
+      tap: false,
+      dragging: true,
+      touchZoom: true,
+      doubleClickZoom: !isMobile,
+      boxZoom: false,
+      keyboard: false,
+      bounceAtZoomLimits: false
     });
 
-    /* Force recalculate map size after mount */
-    setTimeout(function() { map.invalidateSize(); }, 300);
-    /* Also on window resize */
-    window.addEventListener('resize', function() {
-      if (map) map.invalidateSize();
+    /* Force recalculate map size after mount, on resize and on orientation change */
+    function safeInvalidate() { if (map) { try { map.invalidateSize(); } catch(e){} } }
+    setTimeout(safeInvalidate, 300);
+    setTimeout(safeInvalidate, 800);
+    window.addEventListener('resize', safeInvalidate);
+    window.addEventListener('orientationchange', function() {
+      setTimeout(safeInvalidate, 200);
+      setTimeout(safeInvalidate, 600);
     });
+    /* Recalculate also when the map enters viewport (fixes lazy-render issues) */
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(en) { if (en.isIntersecting) safeInvalidate(); });
+      }, { threshold: 0.1 });
+      io.observe(mapContainer);
+    }
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
       subdomains: 'abcd',
@@ -172,6 +186,7 @@
         map.flyTo(initialCenter, initialZoom, { duration: 0.8 });
         mapBackBtn.style.display = 'none';
         isZoomed = false;
+        setTimeout(function() { if (map) map.invalidateSize(); }, 900);
       });
     }
 
@@ -199,6 +214,8 @@
 
             layer.on({
               mouseover: function (e) {
+                /* Skip hover-only behavior on touch devices to avoid stuck tooltips */
+                if (L.Browser.mobile || L.Browser.touch) return;
                 /* Reset previous active layer to avoid sticking highlights */
                 if (activeLayer && activeLayer !== e.target) {
                   geoLayer.resetStyle(activeLayer);
@@ -233,6 +250,7 @@
                 }
               },
               mouseout: function (e) {
+                if (L.Browser.mobile || L.Browser.touch) return;
                 if (activeLayer === e.target) {
                   activeLayer = null;
                 }
@@ -240,6 +258,7 @@
                 if (mapTooltip) mapTooltip.style.display = 'none';
               },
               mousemove: function (e) {
+                if (L.Browser.mobile || L.Browser.touch) return;
                 if (mapTooltip) {
                   var rect = mapContainer.getBoundingClientRect();
                   mapTooltip.style.left = (e.originalEvent.clientX - rect.left + 14) + 'px';
@@ -263,6 +282,19 @@
                     setTimeout(function() {
                       collezione.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }, 400);
+                  }
+                } else if (name) {
+                  /* Touch-friendly: show transient tooltip even for empty countries */
+                  if (mapTooltip) {
+                    mapTooltip.innerHTML =
+                      '<div class="map-tooltip-header">' + flag + ' <strong>' + name + '</strong></div>' +
+                      '<div class="map-tooltip-count"><em>0 campioni</em></div>';
+                    var rect = mapContainer.getBoundingClientRect();
+                    var ev = (window.event && window.event.touches && window.event.touches[0]) || window.event || {};
+                    mapTooltip.style.left = ((ev.clientX || rect.width/2) - rect.left + 14) + 'px';
+                    mapTooltip.style.top  = ((ev.clientY || rect.height/2) - rect.top - 10) + 'px';
+                    mapTooltip.style.display = 'block';
+                    setTimeout(function() { if (mapTooltip) mapTooltip.style.display = 'none'; }, 1800);
                   }
                 }
               }
