@@ -1529,6 +1529,7 @@ h1, h2, h3, h4 {
     height: 260px;
     min-width: unset;
   }
+  .map-container { height: 260px; }
   .leaflet-top.leaflet-left {
     top: 8px;
     left: 8px;
@@ -1807,6 +1808,7 @@ h1, h2, h3, h4 {
   #world-map {
     height: 400px;
   }
+  .map-container { height: 400px; }
   .map-section {
     padding: 2rem 1rem 1.5rem;
   }
@@ -1879,6 +1881,8 @@ h1, h2, h3, h4 {
   overflow: hidden;
   isolation: isolate;
   z-index: 1;
+  height: 520px;
+  min-height: 260px;
 }
 
 /* Keep Leaflet internal panes strictly inside the container */
