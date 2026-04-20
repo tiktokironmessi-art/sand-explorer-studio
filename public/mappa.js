@@ -212,8 +212,6 @@
 
             layer.on({
               mouseover: function (e) {
-                /* Skip hover-only behavior on touch devices to avoid stuck tooltips */
-                if (L.Browser.mobile || L.Browser.touch) return;
                 /* Reset previous active layer to avoid sticking highlights */
                 if (activeLayer && activeLayer !== e.target) {
                   geoLayer.resetStyle(activeLayer);
@@ -248,7 +246,6 @@
                 }
               },
               mouseout: function (e) {
-                if (L.Browser.mobile || L.Browser.touch) return;
                 if (activeLayer === e.target) {
                   activeLayer = null;
                 }
@@ -256,7 +253,6 @@
                 if (mapTooltip) mapTooltip.style.display = 'none';
               },
               mousemove: function (e) {
-                if (L.Browser.mobile || L.Browser.touch) return;
                 if (mapTooltip) {
                   var rect = mapContainer.getBoundingClientRect();
                   mapTooltip.style.left = (e.originalEvent.clientX - rect.left + 14) + 'px';
