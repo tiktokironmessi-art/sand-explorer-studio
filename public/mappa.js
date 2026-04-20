@@ -222,8 +222,8 @@
                 var l = e.target;
                 l.setStyle({
                   fillColor: count > 0 ? COLOR_HOVER : '#D0C8BD',
-                  weight: 2,
-                  color: COLOR_HOVER,
+                  weight: 0,
+                  color: 'transparent',
                   fillOpacity: 0.9
                 });
                 l.bringToFront();
