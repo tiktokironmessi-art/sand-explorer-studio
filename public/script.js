@@ -78,6 +78,17 @@ function initMobileMenu() {
   const nav = document.getElementById('mobile-nav');
   if (!toggle || !nav) return;
 
+  function bindPress(el, handler) {
+    if (!el || el.dataset.pressBound === 'true') return;
+    el.dataset.pressBound = 'true';
+    el.addEventListener('click', handler);
+    el.addEventListener('pointerup', function (e) {
+      if (e.pointerType === 'mouse') return;
+      e.preventDefault();
+      handler(e);
+    });
+  }
+
   function openMenu() {
     nav.classList.add('active');
     nav.setAttribute('aria-hidden', 'false');
@@ -94,15 +105,15 @@ function initMobileMenu() {
     document.body.style.overflow = '';
   }
 
-  toggle.addEventListener('click', function () {
+  bindPress(toggle, function () {
     const isOpen = nav.classList.contains('active');
     isOpen ? closeMenu() : openMenu();
   });
 
-  if (overlay) overlay.addEventListener('click', closeMenu);
+  if (overlay) bindPress(overlay, closeMenu);
 
   nav.querySelectorAll('a').forEach(function (link) {
-    link.addEventListener('click', closeMenu);
+    bindPress(link, closeMenu);
   });
 
   document.addEventListener('keydown', function (e) {
@@ -140,6 +151,16 @@ function initMobileMenu() {
 (function () {
   'use strict';
 
+  function bindPress(el, handler) {
+    if (!el) return;
+    el.addEventListener('click', handler);
+    el.addEventListener('pointerup', function (e) {
+      if (e.pointerType === 'mouse') return;
+      e.preventDefault();
+      handler(e);
+    });
+  }
+
   let campioni = [];
   let filteredCampioni = [];
   let currentView = 'grid';
@@ -165,7 +186,7 @@ function initMobileMenu() {
   /* --- View Toggle --- */
   if (viewToggle) {
     viewToggle.querySelectorAll('.view-toggle-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
+      bindPress(btn, function() {
         var view = btn.dataset.view;
         if (view === currentView) return;
         currentView = view;
@@ -534,7 +555,7 @@ function initMobileMenu() {
   });
   filterPaese.addEventListener('change', applyFilters);
   filterTipologia.addEventListener('change', applyFilters);
-  btnReset.addEventListener('click', resetFilters);
+  bindPress(btnReset, resetFilters);
 
   /* --- Init --- */
   initMobileMenu();
