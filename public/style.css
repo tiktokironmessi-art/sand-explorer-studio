@@ -1374,7 +1374,7 @@ h1, h2, h3, h4 {
 
   /* Map on tablet */
   .map-container {
-    overflow-x: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
 }

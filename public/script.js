@@ -81,12 +81,20 @@ function initMobileMenu() {
   function bindPress(el, handler) {
     if (!el || el.dataset.pressBound === 'true') return;
     el.dataset.pressBound = 'true';
+    var lastTouchPress = 0;
     el.addEventListener('click', handler);
     el.addEventListener('pointerup', function (e) {
       if (e.pointerType === 'mouse') return;
+      lastTouchPress = Date.now();
       e.preventDefault();
       handler(e);
     });
+    el.addEventListener('click', function (e) {
+      if (Date.now() - lastTouchPress < 500) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }, true);
   }
 
   function openMenu() {
@@ -153,12 +161,20 @@ function initMobileMenu() {
 
   function bindPress(el, handler) {
     if (!el) return;
+    var lastTouchPress = 0;
     el.addEventListener('click', handler);
     el.addEventListener('pointerup', function (e) {
       if (e.pointerType === 'mouse') return;
+      lastTouchPress = Date.now();
       e.preventDefault();
       handler(e);
     });
+    el.addEventListener('click', function (e) {
+      if (Date.now() - lastTouchPress < 500) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }, true);
   }
 
   let campioni = [];
