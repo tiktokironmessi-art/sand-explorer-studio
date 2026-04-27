@@ -100,6 +100,7 @@
   var initialZoom = 2;
   var isZoomed = false;
   var activeLayer = null;
+  var mapDragSuppressUntil = 0;
 
   if (!mapContainer) return;
 
@@ -208,6 +209,7 @@
       }
 
       function endPan() {
+        if (dragMoved) mapDragSuppressUntil = Date.now() + 250;
         isDragging = false;
         startPoint = null;
         startCenter = null;
@@ -313,6 +315,7 @@
                 }
               },
               click: function (e) {
+                if (Date.now() < mapDragSuppressUntil) return;
                 if (name && count > 0) {
                   var bounds = layer.getBounds();
                   map.flyToBounds(bounds, { padding: [40, 40], duration: 0.8, maxZoom: 5 });
