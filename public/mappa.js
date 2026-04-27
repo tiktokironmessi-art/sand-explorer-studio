@@ -190,6 +190,7 @@
 
       function beginPan(ev) {
         if (ev.type === 'mousedown' && ev.button !== 0) return;
+        if (ev.target && ev.target.closest && ev.target.closest('.leaflet-control, .map-back-btn')) return;
         isDragging = true;
         dragMoved = false;
         startPoint = getPoint(ev);
@@ -243,6 +244,9 @@
     fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json')
       .then(function (r) { return r.json(); })
       .then(function (topoData) {
+        if (!topoData || !topoData.objects || !topoData.objects.countries) {
+          throw new Error('Dati geografici della mappa non validi');
+        }
         var geoData = topojson.feature(topoData, topoData.objects.countries);
 
         geoLayer = L.geoJSON(geoData, {
