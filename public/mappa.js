@@ -158,6 +158,39 @@
     return geoData;
   }
 
+
+
+  function shiftCoordinateLongitudes(coords, offset) {
+    if (typeof coords[0] === 'number') {
+      return [coords[0] + offset, coords[1]];
+    }
+    return coords.map(function(part) {
+      return shiftCoordinateLongitudes(part, offset);
+    });
+  }
+
+  function createWrappedWorldCopies(geoData) {
+    if (!geoData || !Array.isArray(geoData.features)) return geoData;
+    var wrappedFeatures = [];
+    [-360, 0, 360].forEach(function(offset) {
+      geoData.features.forEach(function(feature) {
+        if (!feature.geometry || !feature.geometry.coordinates) return;
+        wrappedFeatures.push({
+          type: 'Feature',
+          id: feature.id,
+          properties: feature.properties ? Object.assign({}, feature.properties) : {},
+          geometry: {
+            type: feature.geometry.type,
+            coordinates: shiftCoordinateLongitudes(feature.geometry.coordinates, offset)
+          }
+        });
+      });
+    });
+    geoData.features = wrappedFeatures;
+    return geoData;
+  }
+
+
   function initMap(campioni) {
     allCampioni = campioni;
 
@@ -277,6 +310,7 @@
         }
         var geoData = topojson.feature(topoData, topoData.objects.countries);
         fixAntimeridianArtifacts(geoData);
+        createWrappedWorldCopies(geoData);
 
         geoLayer = L.geoJSON(geoData, {
           style: function (feature) {
