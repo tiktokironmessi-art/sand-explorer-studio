@@ -1882,14 +1882,15 @@ h1, h2, h3, h4 {
    ============================================ */
 #world-map,
 .map-container .leaflet-container,
-.map-container .leaflet-map-pane,
-.map-container .leaflet-tile-pane,
-.map-container .leaflet-overlay-pane,
-.map-container .leaflet-zoom-animated,
 .map-container svg,
 .map-container canvas {
-  overflow: hidden !important;
   touch-action: none;
+}
+
+.map-container .leaflet-overlay-pane svg,
+.map-container .leaflet-tile-pane img {
+  max-width: none !important;
+  max-height: none !important;
 }
 
 /* Map container must clip Leaflet panes so they never overlap controls below */
@@ -1909,6 +1910,7 @@ h1, h2, h3, h4 {
   position: relative;
   z-index: 1;
   cursor: grab;
+  overflow: hidden;
 }
 
 .map-container.is-map-dragging .leaflet-container,
