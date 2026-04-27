@@ -130,6 +130,34 @@
     return null;
   }
 
+  function unwrapAntimeridianRing(ring) {
+    if (!Array.isArray(ring) || ring.length < 2) return ring;
+    var unwrapped = [ring[0].slice()];
+    for (var i = 1; i < ring.length; i++) {
+      var point = ring[i].slice();
+      var prevLng = unwrapped[i - 1][0];
+      while (point[0] - prevLng > 180) point[0] -= 360;
+      while (point[0] - prevLng < -180) point[0] += 360;
+      unwrapped.push(point);
+    }
+    return unwrapped;
+  }
+
+  function fixAntimeridianArtifacts(geoData) {
+    if (!geoData || !Array.isArray(geoData.features)) return geoData;
+    geoData.features.forEach(function(feature) {
+      if (!feature.geometry || !feature.geometry.coordinates) return;
+      if (feature.geometry.type === 'Polygon') {
+        feature.geometry.coordinates = feature.geometry.coordinates.map(unwrapAntimeridianRing);
+      } else if (feature.geometry.type === 'MultiPolygon') {
+        feature.geometry.coordinates = feature.geometry.coordinates.map(function(poly) {
+          return poly.map(unwrapAntimeridianRing);
+        });
+      }
+    });
+    return geoData;
+  }
+
   function initMap(campioni) {
     allCampioni = campioni;
 
@@ -248,6 +276,7 @@
           throw new Error('Dati geografici della mappa non validi');
         }
         var geoData = topojson.feature(topoData, topoData.objects.countries);
+        fixAntimeridianArtifacts(geoData);
 
         geoLayer = L.geoJSON(geoData, {
           style: function (feature) {
