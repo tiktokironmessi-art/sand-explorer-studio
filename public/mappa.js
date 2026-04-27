@@ -110,7 +110,7 @@
   var COLOR_HAS_50 = '#7A6651';
   var COLOR_HAS_100 = '#5C4D3C';
   var COLOR_HOVER = '#B85C38';
-  var COLOR_BORDER = '#FFFDF9';
+  var COLOR_BORDER = '#5C4A2A';
 
   function getCountryColor(count) {
     if (!count || count === 0) return COLOR_EMPTY;
@@ -149,13 +149,15 @@
       scrollWheelZoom: true,
       worldCopyJump: true,
       tap: true,
-      dragging: true,
+      dragging: false,
       touchZoom: true,
       doubleClickZoom: true,
       boxZoom: false,
       keyboard: false,
       bounceAtZoomLimits: false
     });
+
+    installMapPanning();
 
     /* Force recalculate map size after mount, on resize and on orientation change */
     function safeInvalidate() { if (map) { try { map.invalidateSize(); } catch(e){} } }
@@ -199,9 +201,10 @@
             var count = countryData[iso] || 0;
             return {
               fillColor: getCountryColor(count),
-              weight: 0,
-              color: 'transparent',
-              stroke: false,
+              weight: 0.85,
+              color: COLOR_BORDER,
+              stroke: true,
+              opacity: 0.8,
               fillOpacity: count > 0 ? 0.85 : 0.4
             };
           },
@@ -222,8 +225,9 @@
                 var l = e.target;
                 l.setStyle({
                   fillColor: count > 0 ? COLOR_HOVER : '#D0C8BD',
-                  weight: 0,
-                  color: 'transparent',
+                  weight: 1.15,
+                  color: COLOR_BORDER,
+                  opacity: 0.95,
                   fillOpacity: 0.9
                 });
                 l.bringToFront();
