@@ -176,6 +176,54 @@
       io.observe(mapContainer);
     }
 
+    function installMapPanning() {
+      var isDragging = false;
+      var dragMoved = false;
+      var startPoint = null;
+      var startCenter = null;
+
+      function getPoint(ev) {
+        var src = ev.touches && ev.touches.length ? ev.touches[0] : ev.changedTouches && ev.changedTouches.length ? ev.changedTouches[0] : ev;
+        return L.point(src.clientX, src.clientY);
+      }
+
+      function beginPan(ev) {
+        if (ev.type === 'mousedown' && ev.button !== 0) return;
+        isDragging = true;
+        dragMoved = false;
+        startPoint = getPoint(ev);
+        startCenter = map.getCenter();
+        mapContainer.classList.add('is-map-dragging');
+        if (ev.cancelable) ev.preventDefault();
+      }
+
+      function movePan(ev) {
+        if (!isDragging || !startPoint || !startCenter) return;
+        var currentPoint = getPoint(ev);
+        var delta = currentPoint.subtract(startPoint);
+        if (Math.abs(delta.x) > 2 || Math.abs(delta.y) > 2) dragMoved = true;
+        var centerPoint = map.latLngToContainerPoint(startCenter).subtract(delta);
+        map.panTo(map.containerPointToLatLng(centerPoint), { animate: false });
+        if (ev.cancelable) ev.preventDefault();
+      }
+
+      function endPan() {
+        isDragging = false;
+        startPoint = null;
+        startCenter = null;
+        mapContainer.classList.remove('is-map-dragging');
+        setTimeout(function() { dragMoved = false; }, 0);
+      }
+
+      mapContainer.addEventListener('mousedown', beginPan);
+      window.addEventListener('mousemove', movePan, { passive: false });
+      window.addEventListener('mouseup', endPan);
+      mapContainer.addEventListener('touchstart', beginPan, { passive: false });
+      mapContainer.addEventListener('touchmove', movePan, { passive: false });
+      mapContainer.addEventListener('touchend', endPan);
+      mapContainer.addEventListener('touchcancel', endPan);
+    }
+
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
       subdomains: 'abcd',
       maxZoom: 19
