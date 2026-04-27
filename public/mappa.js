@@ -100,6 +100,7 @@
   var initialZoom = 2;
   var isZoomed = false;
   var activeLayer = null;
+  var mapDragSuppressUntil = 0;
 
   if (!mapContainer) return;
 
@@ -110,7 +111,7 @@
   var COLOR_HAS_50 = '#7A6651';
   var COLOR_HAS_100 = '#5C4D3C';
   var COLOR_HOVER = '#B85C38';
-  var COLOR_BORDER = '#FFFDF9';
+  var COLOR_BORDER = '#5C4A2A';
 
   function getCountryColor(count) {
     if (!count || count === 0) return COLOR_EMPTY;
@@ -149,13 +150,15 @@
       scrollWheelZoom: true,
       worldCopyJump: true,
       tap: true,
-      dragging: true,
+      dragging: false,
       touchZoom: true,
       doubleClickZoom: true,
       boxZoom: false,
       keyboard: false,
       bounceAtZoomLimits: false
     });
+
+    installMapPanning();
 
     /* Force recalculate map size after mount, on resize and on orientation change */
     function safeInvalidate() { if (map) { try { map.invalidateSize(); } catch(e){} } }
@@ -172,6 +175,55 @@
         entries.forEach(function(en) { if (en.isIntersecting) safeInvalidate(); });
       }, { threshold: 0.1 });
       io.observe(mapContainer);
+    }
+
+    function installMapPanning() {
+      var isDragging = false;
+      var dragMoved = false;
+      var startPoint = null;
+      var startCenter = null;
+
+      function getPoint(ev) {
+        var src = ev.touches && ev.touches.length ? ev.touches[0] : ev.changedTouches && ev.changedTouches.length ? ev.changedTouches[0] : ev;
+        return L.point(src.clientX, src.clientY);
+      }
+
+      function beginPan(ev) {
+        if (ev.type === 'mousedown' && ev.button !== 0) return;
+        isDragging = true;
+        dragMoved = false;
+        startPoint = getPoint(ev);
+        startCenter = map.getCenter();
+        mapContainer.classList.add('is-map-dragging');
+        if (ev.cancelable) ev.preventDefault();
+      }
+
+      function movePan(ev) {
+        if (!isDragging || !startPoint || !startCenter) return;
+        var currentPoint = getPoint(ev);
+        var delta = currentPoint.subtract(startPoint);
+        if (Math.abs(delta.x) > 2 || Math.abs(delta.y) > 2) dragMoved = true;
+        var centerPoint = map.latLngToContainerPoint(startCenter).subtract(delta);
+        map.panTo(map.containerPointToLatLng(centerPoint), { animate: false });
+        if (ev.cancelable) ev.preventDefault();
+      }
+
+      function endPan() {
+        if (dragMoved) mapDragSuppressUntil = Date.now() + 250;
+        isDragging = false;
+        startPoint = null;
+        startCenter = null;
+        mapContainer.classList.remove('is-map-dragging');
+        setTimeout(function() { dragMoved = false; }, 0);
+      }
+
+      mapContainer.addEventListener('mousedown', beginPan);
+      window.addEventListener('mousemove', movePan, { passive: false });
+      window.addEventListener('mouseup', endPan);
+      mapContainer.addEventListener('touchstart', beginPan, { passive: false });
+      mapContainer.addEventListener('touchmove', movePan, { passive: false });
+      mapContainer.addEventListener('touchend', endPan);
+      mapContainer.addEventListener('touchcancel', endPan);
     }
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
@@ -199,9 +251,10 @@
             var count = countryData[iso] || 0;
             return {
               fillColor: getCountryColor(count),
-              weight: 0,
-              color: 'transparent',
-              stroke: false,
+              weight: 0.85,
+              color: COLOR_BORDER,
+              stroke: true,
+              opacity: 0.8,
               fillOpacity: count > 0 ? 0.85 : 0.4
             };
           },
@@ -222,8 +275,9 @@
                 var l = e.target;
                 l.setStyle({
                   fillColor: count > 0 ? COLOR_HOVER : '#D0C8BD',
-                  weight: 0,
-                  color: 'transparent',
+                  weight: 1.15,
+                  color: COLOR_BORDER,
+                  opacity: 0.95,
                   fillOpacity: 0.9
                 });
                 l.bringToFront();
@@ -261,6 +315,7 @@
                 }
               },
               click: function (e) {
+                if (Date.now() < mapDragSuppressUntil) return;
                 if (name && count > 0) {
                   var bounds = layer.getBounds();
                   map.flyToBounds(bounds, { padding: [40, 40], duration: 0.8, maxZoom: 5 });
