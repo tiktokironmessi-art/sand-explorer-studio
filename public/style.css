@@ -1880,8 +1880,16 @@ h1, h2, h3, h4 {
 /* ============================================
    MAP TOUCH FIX
    ============================================ */
-#world-map {
-  touch-action: pan-x pan-y;
+#world-map,
+.map-container .leaflet-container,
+.map-container .leaflet-map-pane,
+.map-container .leaflet-tile-pane,
+.map-container .leaflet-overlay-pane,
+.map-container .leaflet-zoom-animated,
+.map-container svg,
+.map-container canvas {
+  overflow: hidden !important;
+  touch-action: none;
 }
 
 /* Map container must clip Leaflet panes so they never overlap controls below */
@@ -1900,6 +1908,12 @@ h1, h2, h3, h4 {
   height: 100% !important;
   position: relative;
   z-index: 1;
+  cursor: grab;
+}
+
+.map-container.is-map-dragging .leaflet-container,
+.map-container.is-map-dragging .leaflet-interactive {
+  cursor: grabbing;
 }
 
 .map-container .leaflet-container,
@@ -1972,12 +1986,9 @@ h1, h2, h3, h4 {
   /* Ensure no Leaflet pane catches taps on neighbouring controls */
   .leaflet-container { outline: none; }
 
-  .map-container {
-    touch-action: manipulation;
-  }
-
+  .map-container,
   .map-container .leaflet-container {
-    touch-action: pan-x pan-y;
+    touch-action: none;
   }
 }
 
