@@ -163,7 +163,7 @@ function initMobileMenuDetail() {
 
     var imagesHtml = imageBlock(c.immagine, 'Campione di sabbia: ' + c.nome, '📷 Immagine del campione', 'image-qr-main');
     var microscopeImages = [];
-    if (c.microscopio && c.microscopio !== 'images/coming-soon.jpg') {
+    if (c.microscopio && c.microscopio !== 'images/coming-soon.jpg' && c.microscopio !== c.immagine) {
       microscopeImages.push({ src: c.microscopio, label: '🔬 Immagine al microscopio' });
     }
     if (Array.isArray(c.immagini_extra)) {
